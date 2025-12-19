@@ -25,9 +25,9 @@ export default function Navbar() {
                         <a href="/#instructors" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
                             Instructors
                         </a>
-                        <a href="/#about" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
+                        <Link href="/about" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
                             About
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Auth Buttons */}
