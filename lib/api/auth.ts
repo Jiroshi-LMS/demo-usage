@@ -1,5 +1,6 @@
 import apiClient from './axios';
-import type { SignupRequest, SignupResponse, LoginRequest, LoginResponse, ProfileResponse } from '@/types/auth';
+import type { SignupRequest, SignupResponse, LoginRequest, LoginResponse, ProfileResponse, UpdateAccountRequest, UpdateAccountResponse } from '@/types/auth';
+
 
 /**
  * Fetch current student profile
@@ -36,6 +37,18 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
         return response.data;
     } catch (error) {
         console.error('Login failed:', error);
+        throw error;
+    }
+};
+/**
+ * Update student account settings (identifier/email and password)
+ */
+export const updateAccount = async (data: UpdateAccountRequest): Promise<UpdateAccountResponse> => {
+    try {
+        const response = await apiClient.put<UpdateAccountResponse>('/students/account/update/', data);
+        return response.data;
+    } catch (error) {
+        console.error('Account update failed:', error);
         throw error;
     }
 };

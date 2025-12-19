@@ -44,3 +44,19 @@ export interface ProfileResponse {
     data: StudentProfile | null;
     error_code: string | null;
 }
+
+export interface UpdateAccountRequest {
+    identifier?: string;
+    password?: string;
+}
+
+export interface UpdateAccountResponse {
+    status: boolean;
+    results: boolean;
+    message: string;
+    data: {
+        access_token: string;
+    } | null;
+    error_code: string | null;
+}
+
