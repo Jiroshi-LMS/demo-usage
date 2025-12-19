@@ -52,3 +52,20 @@ export const updateAccount = async (data: UpdateAccountRequest): Promise<UpdateA
         throw error;
     }
 };
+
+/**
+ * Check if a student identifier (email) is already taken
+ * Returns true if the identifier is already in use, false otherwise
+ */
+export const checkIdentifierAvailability = async (identifier: string): Promise<boolean> => {
+    try {
+        const response = await apiClient.get('/students/lookup/', {
+            params: { identifier }
+        });
+        return !!response.data.data;
+    } catch (error) {
+        console.error('Identifier lookup failed:', error);
+        return false;
+    }
+};
+

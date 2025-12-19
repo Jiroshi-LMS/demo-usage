@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import { updateAccount } from '@/lib/api/auth';
+import { updateAccount, checkIdentifierAvailability } from '@/lib/api/auth';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
@@ -14,6 +14,8 @@ export default function ProfilePage() {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [updating, setUpdating] = useState(false);
+    const [isCheckingIdentifier, setIsCheckingIdentifier] = useState(false);
+    const [isIdentifierTaken, setIsIdentifierTaken] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -22,6 +24,32 @@ export default function ProfilePage() {
             setIdentifier(user.identifier);
         }
     }, [user, authLoading, router]);
+
+    // Debounced identifier check
+    useEffect(() => {
+        if (!identifier || identifier.length < 5 || !identifier.includes('@') || (user && identifier === user.identifier)) {
+            setIsIdentifierTaken(false);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            try {
+                setIsCheckingIdentifier(true);
+                const taken = await checkIdentifierAvailability(identifier);
+                setIsIdentifierTaken(taken);
+                if (taken) {
+                    toast.warning('This email is already in use by another account');
+                }
+            } catch (err) {
+                console.error('Lookup failed', err);
+            } finally {
+                setIsCheckingIdentifier(false);
+            }
+        }, 800);
+
+        return () => clearTimeout(timer);
+    }, [identifier, user]);
+
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -101,15 +129,28 @@ export default function ProfilePage() {
                                         <label htmlFor="email" className="text-sm font-semibold text-foreground ml-1">
                                             Email Address
                                         </label>
-                                        <input
-                                            id="email"
-                                            type="email"
-                                            value={identifier}
-                                            onChange={(e) => setIdentifier(e.target.value)}
-                                            className="w-full bg-background border border-[var(--border)] rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] smooth-transition text-foreground"
-                                            placeholder="you@example.com"
-                                            required
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                id="email"
+                                                type="email"
+                                                value={identifier}
+                                                onChange={(e) => setIdentifier(e.target.value)}
+                                                className={`w-full bg-background border ${isIdentifierTaken ? 'border-red-500' : 'border-[var(--border)]'} rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] smooth-transition text-foreground pr-12`}
+                                                placeholder="you@example.com"
+                                                required
+                                            />
+                                            {isCheckingIdentifier && (
+                                                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                                    <svg className="animate-spin h-5 w-5 text-[var(--muted-foreground)]" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {isIdentifierTaken && (
+                                            <p className="mt-1 text-xs text-red-500 ml-1">This email is already taken by another account.</p>
+                                        )}
                                         <p className="text-xs text-[var(--muted-foreground)] ml-1">
                                             This is your primary identifier for logging in.
                                         </p>
@@ -137,7 +178,7 @@ export default function ProfilePage() {
                                 <div className="pt-4">
                                     <button
                                         type="submit"
-                                        disabled={updating}
+                                        disabled={updating || isIdentifierTaken || isCheckingIdentifier}
                                         className="w-full gradient-bg text-white font-bold py-4 rounded-2xl hover:opacity-90 smooth-transition shadow-lg transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {updating ? (

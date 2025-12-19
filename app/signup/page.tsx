@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { signup } from '@/lib/api/auth';
+import { signup, checkIdentifierAvailability } from '@/lib/api/auth';
+import { useEffect } from 'react';
 
 export default function SignupPage() {
     const router = useRouter();
@@ -16,7 +17,34 @@ export default function SignupPage() {
 
     // UI state
     const [loading, setLoading] = useState(false);
+    const [isCheckingIdentifier, setIsCheckingIdentifier] = useState(false);
+    const [isIdentifierTaken, setIsIdentifierTaken] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Debounced identifier check
+    useEffect(() => {
+        if (!identifier || identifier.length < 5 || !identifier.includes('@')) {
+            setIsIdentifierTaken(false);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            try {
+                setIsCheckingIdentifier(true);
+                const taken = await checkIdentifierAvailability(identifier);
+                setIsIdentifierTaken(taken);
+                if (taken) {
+                    toast.warning('This email is already registered');
+                }
+            } catch (err) {
+                console.error('Lookup failed', err);
+            } finally {
+                setIsCheckingIdentifier(false);
+            }
+        }, 800);
+
+        return () => clearTimeout(timer);
+    }, [identifier]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,7 +140,7 @@ export default function SignupPage() {
                             <label htmlFor="email" className="block text-sm font-medium text-foreground">
                                 Email address
                             </label>
-                            <div className="mt-1">
+                            <div className="mt-1 relative">
                                 <input
                                     id="email"
                                     name="email"
@@ -121,10 +149,22 @@ export default function SignupPage() {
                                     required
                                     value={identifier}
                                     onChange={(e) => setIdentifier(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-[var(--border)] rounded-md shadow-sm placeholder-[var(--muted-foreground)] focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] sm:text-sm bg-background"
+                                    className={`appearance-none block w-full px-3 py-2 border ${isIdentifierTaken ? 'border-red-500' : 'border-[var(--border)]'} rounded-md shadow-sm placeholder-[var(--muted-foreground)] focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] sm:text-sm bg-background pr-10`}
                                 />
+                                {isCheckingIdentifier && (
+                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg className="animate-spin h-4 w-4 text-[var(--muted-foreground)]" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </div>
+                                )}
                             </div>
+                            {isIdentifierTaken && (
+                                <p className="mt-1 text-xs text-red-500">This email is already in use.</p>
+                            )}
                         </div>
+
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-foreground">
@@ -165,7 +205,7 @@ export default function SignupPage() {
                         <div>
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || isIdentifierTaken || isCheckingIdentifier}
                                 className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed smooth-transition"
                             >
                                 {loading ? (

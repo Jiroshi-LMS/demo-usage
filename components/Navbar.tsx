@@ -19,12 +19,12 @@ export default function Navbar() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
+                        <Link href="/" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
+                            Home
+                        </Link>
                         <Link href="/courses" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
                             Courses
                         </Link>
-                        <a href="/#instructors" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
-                            Instructors
-                        </a>
                         <Link href="/about" className="text-sm font-medium text-foreground hover:text-[var(--primary)] smooth-transition">
                             About
                         </Link>
