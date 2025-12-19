@@ -33,6 +33,10 @@ export interface Lesson {
     createdAt: string;
 }
 
+export interface LessonDetail extends Lesson {
+    videoUrl: string;
+}
+
 // API response structure from your headless backend
 export interface ApiCourseItem {
     uuid: string;
@@ -89,6 +93,14 @@ export interface ApiLessonsResponse {
     error_code: string | null;
 }
 
+export interface ApiLessonDetailResponse {
+    status: boolean;
+    results: boolean;
+    message: string;
+    data: ApiLessonItem & { video_url: string };
+    error_code: string | null;
+}
+
 export interface CoursesResponse {
     courses: Course[];
     nextCursor: string | null;
@@ -104,3 +116,45 @@ export interface CourseFilters {
     search?: string;
     cursor?: string;
 }
+
+export interface LessonResource {
+    uuid: string;
+    title: string;
+    fileSize: number;
+    fileType: string;
+    fileUrl: string;
+    createdAt: string;
+}
+
+export interface RelatedLink {
+    url: string;
+    title: string;
+}
+
+export interface LessonResourcesData {
+    resources: LessonResource[];
+    notes: string;
+    relatedLinks: RelatedLink[];
+}
+
+export interface ApiLessonResourceItem {
+    uuid: string;
+    title: string;
+    file_size: number;
+    file_type: string;
+    file_url: string;
+    created_at: string;
+}
+
+export interface ApiLessonResourcesResponse {
+    status: boolean;
+    results: boolean;
+    message: string;
+    data: {
+        results: ApiLessonResourceItem[];
+        notes: string;
+        related_links: { url: string; title: string }[];
+    } | null;
+    error_code: string | null;
+}
+

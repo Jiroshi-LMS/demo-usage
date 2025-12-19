@@ -30,7 +30,7 @@ export interface LoginResponse {
 
 export interface StudentProfile {
     uuid: string;
-    email: string;
+    identifier: string; // This is the user's email
     first_name?: string;
     last_name?: string;
     avatar?: string;

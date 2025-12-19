@@ -2,44 +2,87 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import { getCourseById, getCourseLessons } from '@/lib/api/courses';
+import { getCourseById, getCourseLessons, enrollInCourse } from '@/lib/api/courses';
 import type { Course, Lesson } from '@/types/course';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 export default function CourseDetailsPage() {
     const params = useParams();
+    const router = useRouter();
+    const { user } = useAuth();
     const courseId = params?.id as string;
 
     const [course, setCourse] = useState<Course | null>(null);
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [loading, setLoading] = useState(true);
+    const [enrolling, setEnrolling] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
+    const fetchData = async () => {
         if (!courseId) return;
+        try {
+            setLoading(true);
+            // Fetch course and lessons in parallel
+            const [courseData, lessonsData] = await Promise.all([
+                getCourseById(courseId),
+                getCourseLessons(courseId)
+            ]);
 
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                // Fetch course and lessons in parallel
-                const [courseData, lessonsData] = await Promise.all([
-                    getCourseById(courseId),
-                    getCourseLessons(courseId)
-                ]);
+            setCourse(courseData);
+            setLessons(lessonsData);
+        } catch (err) {
+            console.error('Failed to load course details:', err);
+            setError('Failed to load course details. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                setCourse(courseData);
-                setLessons(lessonsData);
-            } catch (err) {
-                console.error('Failed to load course details:', err);
-                setError('Failed to load course details. Please try again.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
+    useEffect(() => {
         fetchData();
     }, [courseId]);
+
+    const handleEnrollment = async () => {
+        if (!user) {
+            toast.info('Please sign in to enroll in this course');
+            router.push('/login');
+            return;
+        }
+
+        try {
+            setEnrolling(true);
+            const success = await enrollInCourse(courseId);
+            if (success) {
+                toast.success('Successfully enrolled in the course!');
+                // Refresh course data to update isEnrolled status
+                fetchData();
+            } else {
+                toast.error('Failed to enroll. Please try again.');
+            }
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || 'Enrollment failed. Please try again.');
+        } finally {
+            setEnrolling(false);
+        }
+    };
+
+    const handleLessonLink = (lessonId: string) => {
+        if (!user) {
+            toast.info('Please sign in to view this lesson');
+            router.push('/login');
+            return;
+        }
+
+        if (!course?.isEnrolled) {
+            toast.error('You must be enrolled in this course to view the lessons.');
+            return;
+        }
+
+        router.push(`/courses/${courseId}/lessons/${lessonId}`);
+    };
 
     const getCourseGradient = (id: string | number) => {
         const gradients = [
@@ -140,8 +183,12 @@ export default function CourseDetailsPage() {
                             </div>
 
                             {!course.isEnrolled && (
-                                <button className="gradient-bg text-white font-bold px-8 py-3 rounded-full hover:opacity-90 smooth-transition shadow-lg transform hover:scale-105 active:scale-95">
-                                    Checkout Now
+                                <button
+                                    onClick={handleEnrollment}
+                                    disabled={enrolling}
+                                    className="gradient-bg text-white font-bold px-8 py-3 rounded-full hover:opacity-90 smooth-transition shadow-lg transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {enrolling ? 'Enrolling...' : 'Enroll Now'}
                                 </button>
                             )}
                         </div>
@@ -158,6 +205,7 @@ export default function CourseDetailsPage() {
                             {lessons.length > 0 ? lessons.map((lesson, index) => (
                                 <div
                                     key={lesson.id}
+                                    onClick={() => handleLessonLink(lesson.id)}
                                     className="group flex flex-col sm:flex-row sm:items-center gap-4 p-5 bg-background border border-[var(--border)] rounded-xl hover:border-[var(--primary)] hover:shadow-md smooth-transition cursor-pointer"
                                 >
                                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] group-hover:bg-[var(--primary)]/10 group-hover:text-[var(--primary)] smooth-transition shrink-0 font-bold">

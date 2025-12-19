@@ -1,5 +1,16 @@
 import apiClient from './axios';
-import type { Course, ApiCoursesResponse, ApiCourseItem, CoursesResponse, ApiCourseDetailResponse, ApiLessonsResponse, Lesson, ApiLessonItem } from '@/types/course';
+import type { Course, ApiCoursesResponse, ApiCourseItem, CoursesResponse, ApiCourseDetailResponse, ApiLessonsResponse, Lesson, ApiLessonItem, LessonDetail, ApiLessonDetailResponse, LessonResourcesData, ApiLessonResourcesResponse } from '@/types/course';
+
+/**
+ * Helper to format file size bytes to string
+ */
+export const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
 
 /**
  * Helper to format duration seconds to string
@@ -130,4 +141,84 @@ export const getCourseLessons = async (courseId: string | number): Promise<Lesso
         return [];
     }
 };
+
+/**
+ * Enroll a student in a course
+ */
+export const enrollInCourse = async (courseId: string): Promise<boolean> => {
+    try {
+        const response = await apiClient.post('/courses/enroll/', {
+            course_uuid: courseId
+        });
+        return !!response.data.status;
+    } catch (error) {
+        console.error(`Failed to enroll in course ${courseId}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * Fetch a single lesson details (including video URL)
+ */
+export const getLessonById = async (courseId: string, lessonId: string): Promise<LessonDetail> => {
+    try {
+        const response = await apiClient.get<ApiLessonDetailResponse>(`/courses/${courseId}/lessons/${lessonId}/`);
+        if (!response.data.status || !response.data.data) {
+            throw new Error(response.data.message || 'Failed to fetch lesson details');
+        }
+
+        const data = response.data.data;
+        return {
+            id: data.uuid,
+            title: data.title,
+            description: data.description,
+            duration: formatDuration(data.duration),
+            createdAt: data.created_at,
+            videoUrl: data.video_url,
+        };
+    } catch (error) {
+        console.error(`Failed to fetch lesson ${lessonId}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * Fetch lesson resources, notes, and related links
+ */
+export const getLessonResources = async (courseId: string, lessonId: string): Promise<LessonResourcesData> => {
+    try {
+        const response = await apiClient.get<ApiLessonResourcesResponse>(`/courses/${courseId}/lessons/${lessonId}/resources/`);
+
+        if (!response.data.status || !response.data.data) {
+            return {
+                resources: [],
+                notes: '',
+                relatedLinks: []
+            };
+        }
+
+        const data = response.data.data;
+        return {
+            resources: (data.results || []).map(item => ({
+                uuid: item.uuid,
+                title: item.title,
+                fileSize: item.file_size,
+                fileType: item.file_type,
+                fileUrl: item.file_url,
+                createdAt: item.created_at
+            })),
+            notes: data.notes || '',
+            relatedLinks: data.related_links || []
+        };
+    } catch (error) {
+        console.error(`Failed to fetch resources for lesson ${lessonId}:`, error);
+        return {
+            resources: [],
+            notes: '',
+            relatedLinks: []
+        };
+    }
+};
+
+
 

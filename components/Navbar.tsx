@@ -42,7 +42,7 @@ export default function Navbar() {
                                         <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-[var(--border)]" />
                                     ) : (
                                         <div className="w-8 h-8 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold">
-                                            {user.first_name?.[0] || user.email[0].toUpperCase()}
+                                            {user.first_name?.[0] || user.identifier[0].toUpperCase()}
                                         </div>
                                     )}
                                     <span className="hidden sm:block">
@@ -54,7 +54,7 @@ export default function Navbar() {
                                 <div className="absolute right-0 mt-2 w-48 bg-[var(--card)] rounded-md shadow-lg py-1 border border-[var(--border)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
                                     <div className="px-4 py-2 border-b border-[var(--border)]">
                                         <p className="text-xs text-[var(--muted-foreground)]">Signed in as</p>
-                                        <p className="text-sm font-medium truncate">{user.email}</p>
+                                        <p className="text-sm font-medium truncate">{user.identifier}</p>
                                     </div>
                                     <Link href="/profile" className="block px-4 py-2 text-sm text-foreground hover:bg-[var(--primary)]/5">
                                         Your Profile
