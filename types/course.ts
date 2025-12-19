@@ -158,3 +158,24 @@ export interface ApiLessonResourcesResponse {
     error_code: string | null;
 }
 
+export interface ApiEnrolledCoursesResponse {
+    status: boolean;
+    results: boolean;
+    message: string;
+    data: {
+        count: number;
+        total_pages: number;
+        current_page: number;
+        next: string | null;
+        previous: string | null;
+        results: (ApiCourseItem & { enrolled_at: string })[];
+    } | null;
+    error_code: string | null;
+}
+
+export interface EnrolledCoursesResponse {
+    courses: (Course & { enrolledAt: string })[];
+    count: number;
+    totalPages: number;
+    currentPage: number;
+}

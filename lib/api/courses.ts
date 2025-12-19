@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import type { Course, ApiCoursesResponse, ApiCourseItem, CoursesResponse, ApiCourseDetailResponse, ApiLessonsResponse, Lesson, ApiLessonItem, LessonDetail, ApiLessonDetailResponse, LessonResourcesData, ApiLessonResourcesResponse } from '@/types/course';
+import type { Course, ApiCoursesResponse, ApiCourseItem, CoursesResponse, ApiCourseDetailResponse, ApiLessonsResponse, Lesson, ApiLessonItem, LessonDetail, ApiLessonDetailResponse, LessonResourcesData, ApiLessonResourcesResponse, EnrolledCoursesResponse, ApiEnrolledCoursesResponse } from '@/types/course';
 
 /**
  * Helper to format file size bytes to string
@@ -219,6 +219,38 @@ export const getLessonResources = async (courseId: string, lessonId: string): Pr
         };
     }
 };
+
+/**
+ * Fetch courses enrolled by the user
+ */
+export const getEnrolledCourses = async (page: number = 1): Promise<EnrolledCoursesResponse> => {
+    try {
+        const response = await apiClient.get<ApiEnrolledCoursesResponse>('/courses/enrolled/', {
+            params: { pagination: 'page', page }
+        });
+
+        if (!response.data.status || !response.data.data) {
+            return { courses: [], count: 0, totalPages: 0, currentPage: 0 };
+        }
+
+        const data = response.data.data;
+        const courses = (data.results || []).map(item => ({
+            ...mapApiCourse(item),
+            enrolledAt: item.enrolled_at
+        }));
+
+        return {
+            courses,
+            count: data.count,
+            totalPages: data.total_pages,
+            currentPage: data.current_page
+        };
+    } catch (error) {
+        console.error('Failed to fetch enrolled courses:', error);
+        throw error;
+    }
+};
+
 
 
 
