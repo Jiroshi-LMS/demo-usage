@@ -60,10 +60,8 @@ export const updateAccount = async (data: UpdateAccountRequest): Promise<UpdateA
  */
 export const checkIdentifierAvailability = async (identifier: string): Promise<boolean> => {
     try {
-        const response = await apiClient.get('/students/lookup/', {
-            params: { identifier }
-        });
-        return !!response.data.data;
+        const response = await apiClient.post('/students/lookup/', { "identifier": identifier });
+        return !!response?.data?.data?.student_exists;
     } catch {
         toast.error('Identifier lookup failed.');
         return false;
