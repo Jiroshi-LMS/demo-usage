@@ -46,7 +46,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        checkAuth();
+        const timer = setTimeout(() => {
+            void checkAuth();
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const login = (token: string) => {

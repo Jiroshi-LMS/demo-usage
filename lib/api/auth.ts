@@ -1,4 +1,4 @@
-import apiClient from './axios';
+import apiClient, { isDev } from './axios';
 import { toast } from 'sonner';
 import type { SignupRequest, SignupResponse, LoginRequest, LoginResponse, ProfileResponse, UpdateAccountRequest, UpdateAccountResponse } from '@/types/auth';
 
@@ -21,7 +21,13 @@ export const getProfile = async (): Promise<ProfileResponse> => {
  */
 export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
     try {
-        const response = await apiClient.post<SignupResponse>('/students/signup/', data);
+        const config = isDev ? { headers: { 'X-Client-Type': 'dev' } } : {};
+        const response = await apiClient.post<SignupResponse>('/students/signup/', data, config);
+
+        if (isDev && response.data.data?.refresh_token) {
+            localStorage.setItem('refresh_token', response.data.data.refresh_token);
+        }
+
         return response.data;
     } catch (error) {
         toast.error('Signup failed. Please check your information.');
@@ -34,7 +40,13 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
  */
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     try {
-        const response = await apiClient.post<LoginResponse>('/students/login/', data);
+        const config = isDev ? { headers: { 'X-Client-Type': 'dev' } } : {};
+        const response = await apiClient.post<LoginResponse>('/students/login/', data, config);
+
+        if (isDev && response.data.data?.refresh_token) {
+            localStorage.setItem('refresh_token', response.data.data.refresh_token);
+        }
+
         return response.data;
     } catch (error) {
         toast.error('Login failed. Please check your credentials.');

@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import { useAuth } from '@/context/AuthContext';
 import { getCourses } from '@/lib/api/courses';
 import type { Course } from '@/types/course';
 import { toast } from 'sonner';
 
 export default function CoursesPage() {
+    const { loading: authLoading } = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -18,11 +20,13 @@ export default function CoursesPage() {
     const [hasMore, setHasMore] = useState(false);
 
     useEffect(() => {
+        if (authLoading) return; // Wait for auth check to complete
+
         const timer = setTimeout(() => {
             fetchCourses(undefined, searchQuery);
         }, 500);
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, authLoading]);
 
     const fetchCourses = async (cursor?: string, search: string = searchQuery) => {
         try {

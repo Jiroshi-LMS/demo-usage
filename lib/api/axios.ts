@@ -47,14 +47,17 @@ apiClient.interceptors.request.use(
     }
 );
 
+// Helper to check if we are in dev mode (http)
+export const isDev = !(process.env.NEXT_PUBLIC_NODE_ENV === 'production');
+
 // Response interceptor variables
 let isRefreshing = false;
 let failedQueue: Array<{
     resolve: (value?: unknown) => void;
-    reject: (reason?: any) => void;
+    reject: (reason?: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue.forEach((prom) => {
         if (error) {
             prom.reject(error);
@@ -93,11 +96,34 @@ apiClient.interceptors.response.use(
 
             try {
                 // Attempt to refresh token
-                const response = await apiClient.post('/students/refresh-token/');
+                const refreshConfig: { headers?: Record<string, string> } = {};
+                const refreshData: { refresh_token?: string } = {};
+
+                if (isDev) {
+                    refreshConfig.headers = { 'X-Client-Type': 'dev' };
+                    const refreshToken = localStorage.getItem('refresh_token');
+                    if (refreshToken) {
+                        refreshData.refresh_token = refreshToken;
+                    }
+                }
+
+                interface RefreshResponse {
+                    status: boolean;
+                    data: {
+                        access_token: string;
+                        refresh_token?: string;
+                    };
+                }
+                const response = await apiClient.post<RefreshResponse>('/students/refresh-token/', refreshData, refreshConfig);
 
                 if (response.data?.status && response.data?.data?.access_token) {
                     const newToken = response.data.data.access_token;
                     localStorage.setItem('access_token', newToken);
+
+                    // If in dev mode and we got a new refresh token, update it
+                    if (isDev && response.data.data.refresh_token) {
+                        localStorage.setItem('refresh_token', response.data.data.refresh_token);
+                    }
 
                     apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
                     processQueue(null, newToken);
@@ -111,6 +137,9 @@ apiClient.interceptors.response.use(
                 processQueue(refreshError, null);
                 // Logout logic
                 localStorage.removeItem('access_token');
+                if (isDev) {
+                    localStorage.removeItem('refresh_token');
+                }
                 if (typeof window !== 'undefined') {
                     window.location.href = '/';
                 }

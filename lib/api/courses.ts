@@ -67,7 +67,7 @@ export const getCourses = async (cursor?: string, search?: string): Promise<Cour
         const params: Record<string, string> = {};
         if (cursor) params.cursor = cursor;
         if (search) params.search = search;
-        params.selections = "uuid,title,description,thumbnail,duration"
+        params.selections = "uuid,title,description,thumbnail,duration,created_at,is_enrolled"
         const response = await apiClient.get<ApiCoursesResponse>('/courses/', { params });
 
         // Check if response is successful
