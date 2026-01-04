@@ -22,11 +22,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    useEffect(() => {
-        checkAuth();
-    }, []);
+
 
     const checkAuth = async () => {
+        await Promise.resolve();
         const token = localStorage.getItem('access_token');
         if (token) {
             try {
@@ -37,14 +36,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // Profile fetch failed but token exists. 
                     // It might be expired, but interceptor handles that.
                     // If interceptor fails, it clears token.
-                    console.error('Failed to load profile:', response.message);
+                    toast.error(`Failed to load profile: ${response.message}`);
                 }
-            } catch (error) {
-                console.error('Auth check failed:', error);
+            } catch {
+                toast.error('Auth check failed. Please try again later.');
             }
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
 
     const login = (token: string) => {
         localStorage.setItem('access_token', token);

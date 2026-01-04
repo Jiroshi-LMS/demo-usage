@@ -34,7 +34,7 @@ export default function CourseDetailsPage() {
             setCourse(courseData);
             setLessons(lessonsData);
         } catch (err) {
-            console.error('Failed to load course details:', err);
+            toast.error('Failed to load course details. Please try again.');
             setError('Failed to load course details. Please try again.');
         } finally {
             setLoading(false);

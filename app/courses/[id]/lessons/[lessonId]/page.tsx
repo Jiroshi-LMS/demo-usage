@@ -48,7 +48,7 @@ export default function LessonPage() {
                 setLessons(lessonsList);
                 setResources(resourcesData);
             } catch (err: any) {
-                console.error('Failed to load lesson:', err);
+                toast.error('Failed to load lesson. Please try again.');
                 setError(err.message || 'Failed to load lesson. Please try again.');
             } finally {
                 setLoading(false);

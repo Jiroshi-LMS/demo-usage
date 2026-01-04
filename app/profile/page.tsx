@@ -40,8 +40,8 @@ export default function ProfilePage() {
                 if (taken) {
                     toast.warning('This email is already in use by another account');
                 }
-            } catch (err) {
-                console.error('Lookup failed', err);
+            } catch {
+                toast.error('Identifier lookup failed');
             } finally {
                 setIsCheckingIdentifier(false);
             }
@@ -77,7 +77,7 @@ export default function ProfilePage() {
                 toast.error(response.message || 'Failed to update profile');
             }
         } catch (error: any) {
-            console.error('Update failed:', error);
+            toast.error('Profile update failed.');
             const message = error.response?.data?.message || 'An error occurred during update';
             toast.error(message);
         } finally {

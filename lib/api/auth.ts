@@ -1,4 +1,5 @@
 import apiClient from './axios';
+import { toast } from 'sonner';
 import type { SignupRequest, SignupResponse, LoginRequest, LoginResponse, ProfileResponse, UpdateAccountRequest, UpdateAccountResponse } from '@/types/auth';
 
 
@@ -10,7 +11,7 @@ export const getProfile = async (): Promise<ProfileResponse> => {
         const response = await apiClient.get<ProfileResponse>('/students/profile/');
         return response.data;
     } catch (error) {
-        console.error('Failed to fetch profile:', error);
+        toast.error('Failed to fetch profile. Please try again.');
         throw error;
     }
 };
@@ -23,7 +24,7 @@ export const signup = async (data: SignupRequest): Promise<SignupResponse> => {
         const response = await apiClient.post<SignupResponse>('/students/signup/', data);
         return response.data;
     } catch (error) {
-        console.error('Signup failed:', error);
+        toast.error('Signup failed. Please check your information.');
         throw error;
     }
 };
@@ -36,7 +37,7 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
         const response = await apiClient.post<LoginResponse>('/students/login/', data);
         return response.data;
     } catch (error) {
-        console.error('Login failed:', error);
+        toast.error('Login failed. Please check your credentials.');
         throw error;
     }
 };
@@ -48,7 +49,7 @@ export const updateAccount = async (data: UpdateAccountRequest): Promise<UpdateA
         const response = await apiClient.put<UpdateAccountResponse>('/students/account/update/', data);
         return response.data;
     } catch (error) {
-        console.error('Account update failed:', error);
+        toast.error('Account update failed.');
         throw error;
     }
 };
@@ -63,8 +64,8 @@ export const checkIdentifierAvailability = async (identifier: string): Promise<b
             params: { identifier }
         });
         return !!response.data.data;
-    } catch (error) {
-        console.error('Identifier lookup failed:', error);
+    } catch {
+        toast.error('Identifier lookup failed.');
         return false;
     }
 };

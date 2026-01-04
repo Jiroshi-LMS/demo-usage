@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { getCourses } from '@/lib/api/courses';
 import type { Course } from '@/types/course';
+import { toast } from 'sonner';
 
 export default function CoursesPage() {
     const [courses, setCourses] = useState<Course[]>([]);
@@ -47,7 +48,7 @@ export default function CoursesPage() {
             setHasMore(response.hasMore);
         } catch (err) {
             setError('Failed to load courses. Please try again later.');
-            console.error(err);
+            toast.error('Failed to load courses. Please try again later.');
         } finally {
             setLoading(false);
             setLoadingMore(false);

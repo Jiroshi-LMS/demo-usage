@@ -36,8 +36,8 @@ export default function SignupPage() {
                 if (taken) {
                     toast.warning('This email is already registered');
                 }
-            } catch (err) {
-                console.error('Lookup failed', err);
+            } catch {
+                toast.error('Identifier lookup failed. Please try again.');
             } finally {
                 setIsCheckingIdentifier(false);
             }

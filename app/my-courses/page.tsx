@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import { getEnrolledCourses } from '@/lib/api/courses';
 import type { Course } from '@/types/course';
@@ -30,8 +31,8 @@ export default function MyCoursesPage() {
                 setLoading(true);
                 const data = await getEnrolledCourses();
                 setCourses(data.courses);
-            } catch (err) {
-                console.error('Failed to load enrolled courses:', err);
+            } catch {
+                toast.error('Failed to load enrolled courses. Please try again.');
                 setError('Failed to load your courses. Please try again.');
             } finally {
                 setLoading(false);

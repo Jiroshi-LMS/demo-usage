@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import { getInstructorProfile } from '@/lib/api/instructor';
 import type { InstructorProfileData } from '@/types/instructor';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function AboutPage() {
     const [profile, setProfile] = useState<InstructorProfileData | null>(null);
@@ -18,7 +19,7 @@ export default function AboutPage() {
                 const data = await getInstructorProfile();
                 setProfile(data);
             } catch (err) {
-                console.error('Failed to load instructor profile:', err);
+                toast.error('Failed to load instructor profile. Please try again later.');
                 setError('Failed to load instructor profile. Please try again later.');
             } finally {
                 setLoading(false);

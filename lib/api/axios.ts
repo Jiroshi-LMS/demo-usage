@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 // Get environment variables
 const baseURL = process.env.NEXT_PUBLIC_SERVER_BASE_PATH;
@@ -122,13 +123,13 @@ apiClient.interceptors.response.use(
         // Handle other errors globally
         if (error.response) {
             // Server responded with error status
-            console.error('API Error:', error.response.status, error.response.data);
+            toast.error(`API Error: ${error.response.data?.message || error.response.statusText || 'Something went wrong'}`);
         } else if (error.request) {
             // Request made but no response
-            console.error('Network Error:', error.message);
+            toast.error(`Network Error: ${error.message}`);
         } else {
             // Something else happened
-            console.error('Error:', error.message);
+            toast.error(`Error: ${error.message}`);
         }
         return Promise.reject(error);
     }

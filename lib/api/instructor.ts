@@ -1,4 +1,5 @@
 import apiClient from './axios';
+import { toast } from 'sonner';
 import type { ApiInstructorProfileResponse, InstructorProfileData } from '@/types/instructor';
 
 /**
@@ -14,7 +15,7 @@ export const getInstructorProfile = async (): Promise<InstructorProfileData> => 
 
         return response.data.data;
     } catch (error) {
-        console.error('Failed to fetch instructor profile:', error);
+        toast.error('Failed to fetch instructor profile.');
         throw error;
     }
 };

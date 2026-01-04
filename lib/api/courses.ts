@@ -1,4 +1,5 @@
 import apiClient from './axios';
+import { toast } from 'sonner';
 import type { Course, ApiCoursesResponse, ApiCourseItem, CoursesResponse, ApiCourseDetailResponse, ApiLessonsResponse, Lesson, ApiLessonItem, LessonDetail, ApiLessonDetailResponse, LessonResourcesData, ApiLessonResourcesResponse, EnrolledCoursesResponse, ApiEnrolledCoursesResponse } from '@/types/course';
 
 /**
@@ -71,7 +72,7 @@ export const getCourses = async (cursor?: string, search?: string): Promise<Cour
 
         // Check if response is successful
         if (!response.data.status) {
-            console.error('API returned error status');
+            toast.error('Failed to fetch courses: API returned error status');
             throw new Error(response.data.message || 'Failed to fetch courses');
         }
 
@@ -79,7 +80,7 @@ export const getCourses = async (cursor?: string, search?: string): Promise<Cour
         const apiCourses = response.data.data?.results || [];
 
         if (!Array.isArray(apiCourses)) {
-            console.error('Results is not an array:', apiCourses);
+            toast.error('Unexpected response format from server');
             return {
                 courses: [],
                 nextCursor: null,
@@ -98,7 +99,7 @@ export const getCourses = async (cursor?: string, search?: string): Promise<Cour
             hasMore: !!response.data.data?.next_cursor,
         };
     } catch (error) {
-        console.error('Failed to fetch courses:', error);
+        toast.error('Failed to fetch courses. Please try again.');
         throw error;
     }
 };
@@ -114,7 +115,7 @@ export const getCourseById = async (id: string | number): Promise<Course> => {
         }
         return mapApiCourse(response.data.data);
     } catch (error) {
-        console.error(`Failed to fetch course ${id}:`, error);
+        toast.error(`Failed to fetch course details for ID: ${id}`);
         throw error;
     }
 };
@@ -129,15 +130,15 @@ export const getCourseLessons = async (courseId: string | number): Promise<Lesso
         });
 
         if (!response.data.status) {
-            console.error('API returned error status for lessons');
+            toast.error('Failed to fetch lessons: API returned error status');
             return [];
         }
 
         const apiLessons = response.data.data?.results || [];
         return apiLessons.map(mapApiLesson);
 
-    } catch (error) {
-        console.error(`Failed to fetch lessons for course ${courseId}:`, error);
+    } catch {
+        toast.error('Failed to fetch lessons. Please try again.');
         return [];
     }
 };
@@ -152,7 +153,7 @@ export const enrollInCourse = async (courseId: string): Promise<boolean> => {
         });
         return !!response.data.status;
     } catch (error) {
-        console.error(`Failed to enroll in course ${courseId}:`, error);
+        toast.error('Enrollment failed. Please try again.');
         throw error;
     }
 };
@@ -177,7 +178,7 @@ export const getLessonById = async (courseId: string, lessonId: string): Promise
             videoUrl: data.video_url,
         };
     } catch (error) {
-        console.error(`Failed to fetch lesson ${lessonId}:`, error);
+        toast.error('Failed to fetch lesson details.');
         throw error;
     }
 };
@@ -210,8 +211,8 @@ export const getLessonResources = async (courseId: string, lessonId: string): Pr
             notes: data.notes || '',
             relatedLinks: data.related_links || []
         };
-    } catch (error) {
-        console.error(`Failed to fetch resources for lesson ${lessonId}:`, error);
+    } catch {
+        toast.error('Failed to fetch lesson resources.');
         return {
             resources: [],
             notes: '',
@@ -246,7 +247,7 @@ export const getEnrolledCourses = async (page: number = 1): Promise<EnrolledCour
             currentPage: data.current_page
         };
     } catch (error) {
-        console.error('Failed to fetch enrolled courses:', error);
+        toast.error('Failed to fetch enrolled courses.');
         throw error;
     }
 };
