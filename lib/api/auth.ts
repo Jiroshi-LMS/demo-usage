@@ -80,3 +80,20 @@ export const checkIdentifierAvailability = async (identifier: string): Promise<b
     }
 };
 
+/**
+ * Logout the authenticated student
+ */
+export const logout = async (): Promise<void> => {
+    try {
+        const config = isDev ? { headers: { 'X-Client-Type': 'dev' } } : {};
+        const data = isDev ? { refresh_token: localStorage.getItem('refresh_token') } : {};
+        await apiClient.post('/students/logout/', data, config);
+
+        if (isDev) {
+            localStorage.removeItem('refresh_token');
+        }
+    } catch (error) {
+        // We still want to clear local state even if server logout fails
+        console.error('Logout API failed:', error);
+    }
+};

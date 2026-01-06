@@ -3,14 +3,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { getProfile } from '@/lib/api/auth';
+import { getProfile, logout as apiLogout } from '@/lib/api/auth';
 import { StudentProfile } from '@/types/auth';
 
 interface AuthContextType {
     user: StudentProfile | null;
     loading: boolean;
     login: (token: string) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
     refreshProfile: () => Promise<void>;
 }
 
@@ -61,11 +61,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         checkAuth();
     };
 
-    const logout = () => {
-        localStorage.removeItem('access_token');
-        setUser(null);
-        toast.success('Logged out successfully');
-        router.push('/login');
+    const logout = async () => {
+        try {
+            await apiLogout();
+        } finally {
+            localStorage.removeItem('access_token');
+            setUser(null);
+            toast.success('Logged out successfully');
+            router.push('/login');
+        }
     };
 
     const refreshProfile = async () => {
