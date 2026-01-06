@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LearnHub - Master New Skills with Expert Instructors",
+  title: "LearnHub - Made with Jiroshi",
   description: "Discover and enroll in world-class online courses. Learn at your own pace with expert instructors and join thousands of students achieving their goals.",
 };
 
