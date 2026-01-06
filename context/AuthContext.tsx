@@ -38,9 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // If interceptor fails, it clears token.
                     toast.error(`Failed to load profile: ${response.message}`);
                 }
-            } catch {
-                toast.error('Auth check failed. Please try again later.');
             }
+            catch {
+                toast.error('Auth check failed. Please try again later.');
+                setUser(null);
+            }
+        } else {
+            setUser(null);
         }
         setLoading(false);
     };

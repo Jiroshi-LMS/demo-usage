@@ -37,7 +37,8 @@ apiClient.interceptors.request.use(
     (config) => {
         // Get token from localStorage
         const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-        if (token) {
+        // Skip adding auth header for refresh token requests to avoid circular 401s
+        if (token && !config.url?.includes('/students/refresh-token/')) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -77,7 +78,7 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/students/refresh-token/')) {
             if (isRefreshing) {
                 return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
@@ -137,12 +138,15 @@ apiClient.interceptors.response.use(
                 processQueue(refreshError, null);
                 // Logout logic
                 localStorage.removeItem('access_token');
+
+                // Clear the default authorization header so future requests don't use the invalid token
+                delete apiClient.defaults.headers.common['Authorization'];
+
                 if (isDev) {
                     localStorage.removeItem('refresh_token');
                 }
-                if (typeof window !== 'undefined') {
-                    window.location.href = '/';
-                }
+                // Don't force redirect, let the app handle unauthenticated state
+                // This allows public pages (like /courses) to fallback to guest mode
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
