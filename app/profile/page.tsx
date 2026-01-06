@@ -13,6 +13,7 @@ export default function ProfilePage() {
 
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('');
     const [updating, setUpdating] = useState(false);
     const [isCheckingIdentifier, setIsCheckingIdentifier] = useState(false);
     const [isIdentifierTaken, setIsIdentifierTaken] = useState(false);
@@ -61,18 +62,22 @@ export default function ProfilePage() {
 
         try {
             setUpdating(true);
-            const data: { identifier: string; password?: string } = { identifier: identifier.trim() };
+            const data: { identifier: string; password?: string; current_password?: string } = { identifier: identifier.trim() };
+
             if (password) {
                 data.password = password;
+            }
+            if (currentPassword) {
+                data.current_password = currentPassword;
             }
 
             const response = await updateAccount(data);
 
-            if (response.status && response.data?.access_token) {
+            if (response.status) {
                 toast.success('Profile updated successfully!');
                 // Update the token in context (which also refreshes the profile)
-                login(response.data.access_token);
                 setPassword(''); // Clear password field
+                setCurrentPassword(''); // Clear current password field
             } else {
                 toast.error(response.message || 'Failed to update profile');
             }
@@ -171,6 +176,25 @@ export default function ProfilePage() {
                                         />
                                         <p className="text-xs text-[var(--muted-foreground)] ml-1">
                                             Leave this blank if you don't want to change your password.
+                                        </p>
+                                    </div>
+
+                                    {/* Current Password Field (Mandatory for security) */}
+                                    <div className="space-y-2">
+                                        <label htmlFor="current-password" className="text-sm font-semibold text-foreground ml-1">
+                                            Current Password
+                                        </label>
+                                        <input
+                                            id="current-password"
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className="w-full bg-background border border-[var(--border)] rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/50 focus:border-[var(--primary)] smooth-transition text-foreground"
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <p className="text-xs text-[var(--muted-foreground)] ml-1">
+                                            Enter your current password to save changes.
                                         </p>
                                     </div>
                                 </div>

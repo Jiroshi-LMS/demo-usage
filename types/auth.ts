@@ -50,6 +50,7 @@ export interface ProfileResponse {
 export interface UpdateAccountRequest {
     identifier?: string;
     password?: string;
+    current_password?: string;
 }
 
 export interface UpdateAccountResponse {
