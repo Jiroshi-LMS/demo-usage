@@ -278,8 +278,21 @@ export default function Home() {
           <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
             <p>© 2026 LearnHub Academy. All rights reserved.</p>
             <div className="flex items-center gap-8">
-              <span>Status: Online</span>
-              <span>Region: Global</span>
+              <a
+                href="https://jiroshi.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-card border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all group"
+              >
+                <img src="/icon.png" alt="Jiroshi Icon" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-semibold text-foreground">
+                  Made with <span className="gradient-text">Jiroshi</span>
+                </span>
+              </a>
+              <div className="hidden sm:flex items-center gap-8">
+                <span>Status: Online</span>
+                <span>Region: Global</span>
+              </div>
             </div>
           </div>
         </div>

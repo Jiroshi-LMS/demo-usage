@@ -26,6 +26,7 @@ if (!apiKey) {
 const apiClient = axios.create({
     baseURL,
     timeout: 10000,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
