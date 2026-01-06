@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { login } from '@/lib/api/auth';
+import { login as apiLogin } from '@/lib/api/auth';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
     const router = useRouter();
+    const { login: contextLogin } = useAuth();
 
     // Form state
     const [identifier, setIdentifier] = useState('');
@@ -31,10 +33,10 @@ export default function LoginPage() {
 
         try {
             setLoading(true);
-            const response = await login({ identifier, password });
+            const response = await apiLogin({ identifier, password });
 
             if (response.status && response.data?.access_token) {
-                localStorage.setItem('access_token', response.data.access_token);
+                contextLogin(response.data.access_token);
                 toast.success('Welcome back!');
                 // Success - Redirect to home
                 router.push('/');

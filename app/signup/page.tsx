@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { signup, checkIdentifierAvailability } from '@/lib/api/auth';
 import { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignupPage() {
     const router = useRouter();
+    const { login: contextLogin } = useAuth();
 
     // Form state
     const [identifier, setIdentifier] = useState('');
@@ -77,12 +79,9 @@ export default function SignupPage() {
             const response = await signup({ identifier, password });
 
             if (response.status && response.data?.access_token) {
-                localStorage.setItem('access_token', response.data.access_token);
+                contextLogin(response.data.access_token);
                 toast.success('Account created successfully!');
-                // Success - Redirect to home or login
-                // Note: Token handling would go here if needed explicitly, 
-                // but cookies are handled by server usually or we might store it.
-                // For now, simple redirect.
+                // Success - Redirect to home
                 router.push('/');
             } else {
                 const msg = response.message || 'Signup failed';
