@@ -81,7 +81,7 @@ export default function AboutPage() {
                         <h1 className="text-4xl sm:text-6xl font-bold text-white mb-2 tracking-tight">
                             {instructor.display_name}
                         </h1>
-                        <p className="text-xl text-indigo-200 font-medium">Master Instructor</p>
+                        <p className="text-xl text-indigo-200 font-medium">Instructor</p>
                     </div>
                 </section>
 
@@ -156,9 +156,14 @@ export default function AboutPage() {
                                 </div>
 
                                 <div className="mt-8">
-                                    <button className="w-full gradient-bg text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transform hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                    <a
+                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${instructor.email}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block w-full text-center gradient-bg text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transform hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                    >
                                         Get in Touch
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
