@@ -1,313 +1,285 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import { getCourses } from '@/lib/api/courses';
+import type { Course } from '@/types/course';
+import { toast } from 'sonner';
 
 export default function Home() {
+  const [latestCourse, setLatestCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestCourse = async () => {
+      try {
+        setLoading(true);
+        const response = await getCourses();
+        if (response.courses.length > 0) {
+          setLatestCourse(response.courses[0]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest course:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestCourse();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] text-sm font-medium mb-6 animate-fade-in">
-              <span className="w-2 h-2 bg-[var(--success)] rounded-full mr-2 animate-pulse"></span>
-              Join 50,000+ students learning online
+      <main>
+        {/* Modern Hero Section */}
+        <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          {/* Abstract Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="text-left animate-fade-in-up">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-2 animate-ping"></span>
+                  Admissions Open for Winter 2026
+                </div>
+
+                <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+                  Accelerate Your <br />
+                  <span className="gradient-text">Career Growth</span> <br />
+                  with Expert Coaching
+                </h1>
+
+                <p className="text-xl text-muted-foreground mb-10 max-w-xl leading-relaxed">
+                  Join an exclusive community of learners. Get direct mentorship from industry leaders and master the skills that actually matter in today's market.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/courses"
+                    className="gradient-bg text-white font-bold px-10 py-5 rounded-2xl hover:opacity-90 smooth-transition shadow-2xl shadow-primary/20 text-center text-lg"
+                  >
+                    Start Learning Now
+                  </Link>
+                  <button className="bg-muted text-foreground font-bold px-10 py-5 rounded-2xl hover:bg-muted/80 smooth-transition text-center border border-border text-lg">
+                    Success Stories
+                  </button>
+                </div>
+
+                <div className="mt-12 flex items-center gap-6">
+                  <div className="flex -space-x-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-12 h-12 rounded-full border-4 border-background bg-muted overflow-hidden">
+                        <img src={`https://i.pravatar.cc/150?u=${i + 10}`} alt="Student" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-sm font-medium">
+                    <span className="text-primary font-bold">4.9/5</span> from 2,000+ happy alumni
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative group perspective-1000 hidden lg:block">
+                <div className="relative z-10 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(var(--primary-rgb),0.3)] animate-float">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <img
+                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop"
+                    alt="Premium Education"
+                    className="w-full h-[600px] object-cover"
+                  />
+                  <div className="absolute bottom-8 left-8 right-8 text-white">
+                    <div className="text-sm font-bold uppercase tracking-widest text-primary mb-2">Live Workshop</div>
+                    <h3 className="text-2xl font-bold">Scaling Modern Applications in 2026</h3>
+                  </div>
+                </div>
+                {/* Decorative Elements */}
+                <div className="absolute -top-6 -right-6 w-32 h-32 bg-primary/20 rounded-full blur-2xl -z-10 group-hover:bg-primary/30 transition-all duration-700"></div>
+                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl -z-10 group-hover:bg-purple-500/30 transition-all duration-700"></div>
+              </div>
             </div>
+          </div>
+        </section>
 
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight animate-fade-in" style={{ animationDelay: '0.1s', opacity: 0 }}>
-              Master New Skills with{' '}
-              <span className="gradient-text">Expert Instructors</span>
-            </h1>
-
-            {/* Description */}
-            <p className="text-lg sm:text-xl text-[var(--muted-foreground)] mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s', opacity: 0 }}>
-              Discover world-class courses taught by industry professionals. Learn at your own pace and achieve your goals with our comprehensive learning platform.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.3s', opacity: 0 }}>
-              <Link href="/courses" className="gradient-bg text-white font-medium px-8 py-4 rounded-full hover:opacity-90 smooth-transition shadow-lg w-full sm:w-auto inline-flex items-center justify-center">
-                Browse Courses
+        {/* Latest Course Section */}
+        <section className="py-24 bg-muted/30 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 text-center md:text-left">
+              <div>
+                <h2 className="text-sm font-bold uppercase tracking-widest text-primary mb-4">Latest Arrival</h2>
+                <h3 className="text-4xl sm:text-5xl font-extrabold">Newest Course Launch</h3>
+              </div>
+              <Link href="/courses" className="text-primary font-bold hover:underline flex items-center gap-2 group text-lg">
+                View All Courses <span className="group-hover:translate-x-1 transition-transform">→</span>
               </Link>
-              <button className="bg-background border-2 border-[var(--border)] text-foreground font-medium px-8 py-4 rounded-full hover:border-[var(--primary)] smooth-transition w-full sm:w-auto">
-                Watch Demo
-              </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 mt-16 pt-16 border-t border-[var(--border)] animate-fade-in" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              <div>
-                <div className="text-3xl sm:text-4xl font-bold gradient-text">500+</div>
-                <div className="text-sm text-[var(--muted-foreground)] mt-1">Courses</div>
+            {loading ? (
+              <div className="w-full h-[400px] bg-card/50 rounded-3xl animate-pulse flex items-center justify-center border border-border">
+                <span className="text-muted-foreground font-medium">Preparing curriculum...</span>
               </div>
-              <div>
-                <div className="text-3xl sm:text-4xl font-bold gradient-text">50K+</div>
-                <div className="text-sm text-[var(--muted-foreground)] mt-1">Students</div>
+            ) : latestCourse ? (
+              <div className="bg-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-border flex flex-col lg:flex-row hover:shadow-primary/5 transition-all duration-500">
+                <div className="lg:w-1/2 relative h-[300px] lg:h-auto overflow-hidden">
+                  {latestCourse.thumbnail ? (
+                    <img src={latestCourse.thumbnail} alt={latestCourse.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
+                      <span className="text-white font-bold text-4xl">NEW</span>
+                    </div>
+                  )}
+                  <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl text-sm font-bold text-primary shadow-lg uppercase tracking-tight">
+                    Premium Coaching
+                  </div>
+                </div>
+                <div className="lg:w-1/2 p-8 lg:p-16 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-xs font-bold uppercase text-primary bg-primary/10 px-4 py-1.5 rounded-full">
+                      Trending
+                    </span>
+                    <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      {latestCourse.duration}
+                    </span>
+                  </div>
+                  <h4 className="text-3xl lg:text-4xl font-bold mb-6 hover:text-primary transition-colors cursor-pointer">
+                    {latestCourse.title}
+                  </h4>
+                  <p className="text-lg text-muted-foreground mb-8 line-clamp-3 leading-relaxed">
+                    {latestCourse.description}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-8 justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center font-bold text-primary text-xl shadow-inner">
+                        {latestCourse.title[0]}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase text-muted-foreground">Expert Led</p>
+                        <p className="font-bold">Main Academy</p>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/courses/${latestCourse.id}`}
+                      className="gradient-bg text-white font-bold px-10 py-4 rounded-2xl hover:opacity-90 smooth-transition shadow-xl text-center"
+                    >
+                      Enroll Now
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-3xl sm:text-4xl font-bold gradient-text">4.8★</div>
-                <div className="text-sm text-[var(--muted-foreground)] mt-1">Rating</div>
+            ) : (
+              <div className="text-center py-20 bg-card rounded-3xl border border-dashed border-border">
+                <p className="text-muted-foreground text-lg">No courses available at the moment. Stay tuned!</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Why Choose Us - Coaching Style */}
+        <section className="py-24 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-20 max-w-3xl mx-auto">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-primary mb-4">Our Methodology</h2>
+              <h3 className="text-4xl sm:text-5xl font-extrabold mb-6">Built for Outcomes, <br /> Not Just Certificates</h3>
+              <p className="text-lg text-muted-foreground">We focus on high-impact learning that translates directly to career success and practical mastery.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { title: 'Personalized Mentorship', desc: 'Direct access to instructors for personalized guidance and career advice.', icon: '🎓' },
+                { title: 'Project-Based Learning', desc: 'Build a portfolio of real-world projects that impress recruiters.', icon: '⚡' },
+                { title: 'Industry Network', desc: 'Join an exclusive alumni network of professionals at top tech companies.', icon: '🌍' }
+              ].map((feature, idx) => (
+                <div key={idx} className="group p-10 rounded-[2rem] bg-card border border-border hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-500">
+                    {feature.icon}
+                  </div>
+                  <h4 className="text-2xl font-bold mb-4">{feature.title}</h4>
+                  <p className="text-muted-foreground leading-relaxed text-lg">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className="py-20 px-4 mb-20">
+          <div className="max-w-7xl mx-auto relative overflow-hidden rounded-[3rem] gradient-bg p-12 lg:p-24 shadow-[0_50px_100px_rgba(var(--primary-rgb),0.3)]">
+            {/* Decorative background circle */}
+            <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-white/10 rounded-full blur-[100px] -z-0"></div>
+
+            <div className="relative z-10 text-center text-white max-w-4xl mx-auto">
+              <h2 className="text-4xl sm:text-6xl font-extrabold mb-8 leading-tight">
+                Stop Learning in Isolation. <br /> Start Growing with Us.
+              </h2>
+              <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Take the next step in your career with a community that supports your ambition.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-6">
+                <Link href="/courses" className="bg-white text-primary font-bold px-12 py-5 rounded-2xl hover:bg-white/90 smooth-transition text-xl shadow-2xl">
+                  View Catalog
+                </Link>
+                <Link href="/about" className="bg-primary-foreground/10 backdrop-blur-md text-white border border-white/20 font-bold px-12 py-5 rounded-2xl hover:bg-white/10 smooth-transition text-xl">
+                  Contact Admissions
+                </Link>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* Featured Courses Section */}
-      <section id="courses" className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--muted)]">
+      {/* Modern Footer */}
+      <footer className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/50 border-t border-border">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Featured Courses
-            </h2>
-            <p className="text-lg text-[var(--muted-foreground)] max-w-2xl mx-auto">
-              Start learning with our most popular courses taught by industry experts
-            </p>
-          </div>
-
-          {/* Course Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Course Card 1 */}
-            <div className="bg-background rounded-2xl overflow-hidden card-hover shadow-md">
-              <div className="h-48 bg-gradient-to-br from-purple-500 to-pink-500 relative">
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-purple-600">
-                  Bestseller
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-                    Development
-                  </span>
-                  <span className="text-xs text-[var(--muted-foreground)]">12 hours</span>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Complete Web Development Bootcamp
-                </h3>
-                <p className="text-sm text-[var(--muted-foreground)] mb-4">
-                  Master modern web development with HTML, CSS, JavaScript, React, and Node.js
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500"></div>
-                    <span className="text-sm font-medium text-foreground">Sarah Chen</span>
-                  </div>
-                  <div className="text-2xl font-bold gradient-text">$49</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Course Card 2 */}
-            <div className="bg-background rounded-2xl overflow-hidden card-hover shadow-md">
-              <div className="h-48 bg-gradient-to-br from-blue-500 to-cyan-500 relative">
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-blue-600">
-                  New
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    Data Science
-                  </span>
-                  <span className="text-xs text-[var(--muted-foreground)]">18 hours</span>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Python for Data Science & AI
-                </h3>
-                <p className="text-sm text-[var(--muted-foreground)] mb-4">
-                  Learn Python, data analysis, machine learning, and AI fundamentals from scratch
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500"></div>
-                    <span className="text-sm font-medium text-foreground">Dr. James Liu</span>
-                  </div>
-                  <div className="text-2xl font-bold gradient-text">$59</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Course Card 3 */}
-            <div className="bg-background rounded-2xl overflow-hidden card-hover shadow-md">
-              <div className="h-48 bg-gradient-to-br from-orange-500 to-red-500 relative">
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-orange-600">
-                  Popular
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
-                    Design
-                  </span>
-                  <span className="text-xs text-[var(--muted-foreground)]">10 hours</span>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  UI/UX Design Masterclass
-                </h3>
-                <p className="text-sm text-[var(--muted-foreground)] mb-4">
-                  Create stunning user experiences with modern design principles and Figma
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500"></div>
-                    <span className="text-sm font-medium text-foreground">Maria Garcia</span>
-                  </div>
-                  <div className="text-2xl font-bold gradient-text">$45</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* View All Button */}
-          <div className="text-center mt-12">
-            <Link href="/courses" className="inline-flex items-center border-2 border-[var(--border)] text-foreground font-medium px-8 py-3 rounded-full hover:border-[var(--primary)] hover:text-[var(--primary)] smooth-transition">
-              View All Courses →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Why Choose LearnHub?
-            </h2>
-            <p className="text-lg text-[var(--muted-foreground)] max-w-2xl mx-auto">
-              Everything you need to succeed in your learning journey
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="text-center p-8 rounded-2xl bg-[var(--muted)] hover:bg-background hover:shadow-lg smooth-transition">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">
-                🎓
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Expert Instructors</h3>
-              <p className="text-[var(--muted-foreground)]">
-                Learn from industry professionals with years of real-world experience
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-16">
+            <div className="col-span-1 lg:col-span-1">
+              <h3 className="text-2xl font-bold gradient-text mb-6">LearnHub Academy</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Empowering the next generation of digital leaders through expert-led coaching and project-based learning.
               </p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="text-center p-8 rounded-2xl bg-[var(--muted)] hover:bg-background hover:shadow-lg smooth-transition">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold">
-                ⚡
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Learn at Your Pace</h3>
-              <p className="text-[var(--muted-foreground)]">
-                Access courses anytime, anywhere with lifetime access to all materials
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="text-center p-8 rounded-2xl bg-[var(--muted)] hover:bg-background hover:shadow-lg smooth-transition">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white text-2xl font-bold">
-                🏆
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Certificate of Completion</h3>
-              <p className="text-[var(--muted-foreground)]">
-                Earn recognized certificates to showcase your new skills and knowledge
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--muted)]">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
-            Ready to Start Learning?
-          </h2>
-          <p className="text-lg text-[var(--muted-foreground)] mb-8 max-w-2xl mx-auto">
-            Join thousands of students already learning on LearnHub. Start your journey today with our 30-day money-back guarantee.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="gradient-bg text-white font-medium px-8 py-4 rounded-full hover:opacity-90 smooth-transition shadow-lg w-full sm:w-auto">
-              Start Free Trial
-            </button>
-            <button className="bg-background border-2 border-[var(--border)] text-foreground font-medium px-8 py-4 rounded-full hover:border-[var(--primary)] smooth-transition w-full sm:w-auto">
-              View Pricing
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--border)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            {/* Brand */}
             <div>
-              <h3 className="text-xl font-bold gradient-text mb-4">LearnHub</h3>
-              <p className="text-sm text-[var(--muted-foreground)]">
-                Empowering learners worldwide with quality education
-              </p>
-            </div>
-
-            {/* Links Column 1 */}
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Platform</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Browse Courses</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Become Instructor</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Pricing</a></li>
+              <h4 className="font-bold text-foreground mb-6 uppercase tracking-wider text-sm">Platform</h4>
+              <ul className="space-y-4 font-medium text-muted-foreground">
+                <li><Link href="/courses" className="hover:text-primary transition-colors">Course Catalog</Link></li>
+                <li><Link href="/" className="hover:text-primary transition-colors">Success Stories</Link></li>
+                <li><Link href="/about" className="hover:text-primary transition-colors">Become a Coach</Link></li>
               </ul>
             </div>
 
-            {/* Links Column 2 */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">About Us</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Careers</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Contact</a></li>
+              <h4 className="font-bold text-foreground mb-6 uppercase tracking-wider text-sm">Company</h4>
+              <ul className="space-y-4 font-medium text-muted-foreground">
+                <li><Link href="/about" className="hover:text-primary transition-colors">About the Academy</Link></li>
+                <li><Link href="/" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/" className="hover:text-primary transition-colors">Terms of Use</Link></li>
               </ul>
             </div>
 
-            {/* Links Column 3 */}
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Help Center</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Terms of Service</a></li>
-                <li><a href="#" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">Privacy Policy</a></li>
-              </ul>
+              <h4 className="font-bold text-foreground mb-6 uppercase tracking-wider text-sm">Follow Excellence</h4>
+              <div className="flex gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 cursor-pointer transition-all">
+                    <div className="w-5 h-5 bg-muted-foreground group-hover:bg-primary" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between">
-            <p className="text-sm text-[var(--muted-foreground)]">
-              © 2025 LearnHub. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6 mt-4 sm:mt-0">
-              <a href="#" className="text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">
-                <span className="sr-only">Twitter</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-              </a>
-              <a href="#" className="text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">
-                <span className="sr-only">GitHub</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-[var(--muted-foreground)] hover:text-[var(--primary)] smooth-transition">
-                <span className="sr-only">LinkedIn</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" />
-                </svg>
-              </a>
+          <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
+            <p>© 2026 LearnHub Academy. All rights reserved.</p>
+            <div className="flex items-center gap-8">
+              <span>Status: Online</span>
+              <span>Region: Global</span>
             </div>
           </div>
         </div>
