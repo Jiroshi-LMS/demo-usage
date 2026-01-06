@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+
 import Navbar from '@/components/Navbar';
 import { updateAccount, checkIdentifierAvailability } from '@/lib/api/auth';
 import { toast } from 'sonner';
